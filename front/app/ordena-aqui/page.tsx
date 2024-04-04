@@ -187,14 +187,14 @@ export default function Home() {
                       </div>
                       {producto.opciones.length < 1 ? null : 
                       <div className="grid grid-rows-3 grid-flow-col gap-2 w-full pt-4">
-                        {producto.opciones.map(opcion => (
+                        {producto.opciones.map(opcion => 
                         <div className="flex flex-row justify-evenly w-full basis-full">
                           <p className="flex self-center basis-1/2">{opcion.titulo}</p>
                           <Button onClick={()=>{quitarOpcion(producto, opcion)}}>-</Button>
                           <p className="flex self-center justify-center basis-1/6">{opcion.cantidad}</p>
                           <Button onClick={()=>{agregarOpcion(producto, opcion)}}>+</Button>
                         </div>
-                        ))}
+                        )}
                       </div>
                       }
                     </div>
