@@ -12,3 +12,38 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Producto {
+  id Int @id @default(autoincrement())
+  titulo String 
+  descripcion String
+  precio Int
+  opciones Opcion[]
+  pedidos Pedido[]
+}
+
+model Pedido {
+  id String @id @default(nanoid(4))
+  nombre String
+  productos Producto[]
+  total Int
+  estado Boolean
+  opcionesPedido OpcionPedido[]
+}
+
+model Opcion {
+  id Int @id @default(autoincrement())
+  titulo String
+  productos Producto[]
+  opcionesPedido OpcionPedido[]
+}
+
+model OpcionPedido {
+  opcion Opcion @relation(fields: [opcionId], references: [id])
+  opcionId Int
+  cantidad Int
+  pedido Pedido @relation(fields: [pedidoId], references: [id])
+  pedidoId String
+  @@id([opcionId,pedidoId])
+  @@unique([opcionId,pedidoId])
+}

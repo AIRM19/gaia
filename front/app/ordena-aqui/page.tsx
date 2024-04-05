@@ -51,8 +51,8 @@ interface Producto {
   opciones: Array<ObjetoOpcion> 
 }
 
-const listaProductos: Producto[] = [{id:1, titulo:"3 gorditas", descripcion:"firjol con queso, picadillo o huitlacoche", precio:50, cantidad:0, cantidadOpciones:0, opciones:[{titulo: "frijol con queso", cantidad: 0}, {titulo: "picadillo", cantidad: 0}, {titulo: "huitlacoche", cantidad: 0}]},
-                                    {id:2, titulo:"3 tacos", descripcion:"firjol con queso, picadillo o huitlacoche", precio:50, cantidad:0, cantidadOpciones:0, opciones:[{titulo: "frijol con queso", cantidad: 0}, {titulo: "picadillo", cantidad: 0}, {titulo: "huitlacoche", cantidad: 0}]},
+const listaProductos: Producto[] = [{id:1, titulo:"3 gorditas", descripcion:"frijol con queso, picadillo o huitlacoche", precio:50, cantidad:0, cantidadOpciones:0, opciones:[{titulo: "frijol con queso", cantidad: 0}, {titulo: "picadillo", cantidad: 0}, {titulo: "huitlacoche", cantidad: 0}]},
+                                    {id:2, titulo:"3 tacos", descripcion:"frijol con queso, picadillo o huitlacoche", precio:50, cantidad:0, cantidadOpciones:0, opciones:[{titulo: "frijol con queso", cantidad: 0}, {titulo: "picadillo", cantidad: 0}, {titulo: "huitlacoche", cantidad: 0}]},
                                     {id:3, titulo:"1 sincronizada", descripcion:"queso y jamón", precio:25, cantidad:0, cantidadOpciones:0, opciones:[]},
                                     {id:4, titulo:"tortillas verdes", descripcion:"paquete 500 gramos", precio:50, cantidad:0, cantidadOpciones:0, opciones:[]},
                                     {id:5, titulo:"1 limonada", descripcion:"400mL", precio:15, cantidad:0, cantidadOpciones:0, opciones:[]}]
