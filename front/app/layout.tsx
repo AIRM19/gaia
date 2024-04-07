@@ -9,8 +9,8 @@ const fontSans = FontSans({
 })
 
 export const metadata: Metadata = {
-  title: 'Pedido',
-  description: 'Gaia',
+  title: 'Gaia',
+  description: 'Pedidos',
 };
 
 export default function RootLayout({children,}: Readonly<{children: React.ReactNode;}>) {

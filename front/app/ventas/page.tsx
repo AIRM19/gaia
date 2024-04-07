@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 
 interface Opcion{
+    id: number,
     titulo: string,
     cantidad: number
 }
@@ -23,25 +24,37 @@ interface Platillo{
 }
 
 interface Pedido{
-    id: number,
+    id: string,
     nombre: string,
-    productos: Array<Platillo>,
     total: number,
     estado: boolean
+    productos: Array<Platillo>,
 }
 
 const listaPedidos = [{id: 1234, nombre: "Luisa", productos: [{id:1, titulo: "3 gorditas", cantidad: 1, opciones: [{titulo: "frijoles", cantidad: 2}, {titulo: "huitlacoche", cantidad: 1}]}, {id:4, titulo: "1 limonada", cantidad: 1, opciones: []}], total: 60, estado: false},
                       {id: 1235, nombre: "Sofia", productos: [{id:3, titulo: "1 sincronizada", cantidad: 2, opciones: []}, {id:4, titulo: "1 limonada", cantidad: 2, opciones: []}], total: 70, estado: false},
                       {id: 1236, nombre: "Jorge", productos: [{id:2, titulo: "3 tacos", cantidad: 1, opciones: [{titulo: "picadillo", cantidad:3}]}], total: 50, estado: false}]
-                
-const platillos = [{id:1, titulo:"3 gorditas"}, {id:2, titulo:"3 tacos"}, {id:3, titulo:"1 sincronizada"}, {id:4, titulo:"1 limonada"}]
 
+const platillos = [{id:1, titulo:"3 gorditas"}, {id:2, titulo:"3 tacos"}, {id:3, titulo:"1 sincronizada"}, {id:4, titulo:"tortillas verdes"}, {id:5, titulo:"1 limonada"}]
+                      
 export default function Pedidos() {
-    const [pedidos, setPedidos] = useState<Pedido[]>(listaPedidos)
+    const [pedidos, setPedidos] = useState<Pedido[]>([])
+    
+    useEffect(() => {
+        const fetchProductos = async () => {
+          const request = await fetch("http://localhost:3000/pedido")
+          const ped = await request.json()
+          console.log(ped)
+          setPedidos(ped)
+        }
+        fetchProductos().catch(console.error)
+      }, [])
+    
     const cambiarEstatusOrden = (orden: Pedido) => {
         orden.estado = !orden.estado
         setPedidos([...pedidos])
     }
+    
     return (
         <main>
             <div className="flex justify-evenly">
@@ -62,19 +75,18 @@ export default function Pedidos() {
                                 <TableCell className="flex-wrap">{pedido.nombre}</TableCell>
                                 <TableCell>
                                     {pedido.productos.map(producto =>
-                                        <div>
-                                            <p>{producto.cantidad}&emsp;{producto.titulo}</p>
+                                        <div key={producto.id} className="mb-2">
+                                            <p className="font-medium">{producto.cantidad}&emsp;{producto.titulo}</p>
                                             {producto.opciones.map(opcion => 
-                                                <p>&nbsp;&nbsp;&emsp;{opcion.cantidad}&nbsp;{opcion.titulo}</p>
+                                                <p key={opcion.id}>&nbsp;&nbsp;&emsp;{opcion.cantidad}&nbsp;{opcion.titulo}</p>
                                             )}
-                                            
                                         </div>
                                     )}
                                 </TableCell>
                                 <TableCell className="font-medium text-center w-[100px]">${pedido.total}</TableCell>
                                 {pedido.estado == false ? 
-                                <TableCell onClick={()=>{cambiarEstatusOrden(pedido)}} className="text-center"><Button className="w-[100px]">Terminar</Button></TableCell>:
-                                <TableCell onClick={()=>{cambiarEstatusOrden(pedido)}} className="text-center"><Button className="bg-green-500 hover:bg-green-600 w-[100px]">Completo</Button></TableCell>
+                                <TableCell onClick={()=>{cambiarEstatusOrden(pedido)}} className="text-center"><Button className="w-[100px]">Preparando</Button></TableCell>:
+                                <TableCell onClick={()=>{cambiarEstatusOrden(pedido)}} className="text-center"><Button className="bg-green-500 hover:bg-green-600 w-[100px]">Terminado</Button></TableCell>
                                 }
                             </TableRow>
                         )}

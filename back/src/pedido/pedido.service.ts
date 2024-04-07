@@ -10,9 +10,70 @@ export class PedidoService{
     constructor(private prisma: PrismaService){}
     
     async getPedidos(): Promise<any>{
-        return this.prisma.pedido.findMany({
+        const pedidos = await this.prisma.pedido.findMany({
             include: {productos: true, opcionesPedido: true},
         })
+        let result = []
+        
+        const listaProductos = await this.prisma.producto.findMany({
+            select: {
+                id: true,
+                titulo: true
+            }
+        })
+        
+        const listaOpciones = await this.prisma.opcion.findMany({
+            select: {
+                id: true,
+                titulo: true
+            }
+        })
+        
+        let opciones = pedidos.map(pedido => {
+            return pedido.productos.map(producto => {
+                const filtered = pedido.opcionesPedido.filter(opcion => {if(producto.productoId == opcion.productoId){return true}})
+                const mapped = filtered.map(opcion => {
+                    return {
+                    id: opcion.opcionId,
+                    titulo: listaOpciones.find(objOpcion => objOpcion.id == opcion.opcionId).titulo,
+                    cantidad: opcion.cantidad                            
+                }})
+                return mapped
+            })
+        })
+        
+        let productos = pedidos.map(pedido => {
+             return pedido.productos.map(producto => {
+                const filtered = pedido.opcionesPedido.filter(opcion => {if(producto.productoId == opcion.productoId){return true}})
+                const mapped = filtered.map(opcion => {
+                    return {
+                    id: opcion.opcionId,
+                    titulo: listaOpciones.find(objOpcion => objOpcion.id == opcion.opcionId).titulo,
+                    cantidad: opcion.cantidad                            
+                }})
+                const a = {
+                    id: producto.productoId,
+                    titulo: listaProductos.find(objProducto => objProducto.id == producto.productoId).titulo,
+                    cantidad: producto.cantidad,
+                    opciones: mapped
+                }
+                return a
+            })
+        })
+        
+        log(productos)
+        
+        pedidos.map((pedido,index) => {
+            result.push({
+                id: pedido.id,
+                nombre: pedido.nombre,
+                total: pedido.total,
+                estado: pedido.estado,
+                productos: productos[index]
+            })
+        })
+        
+        return result
     }
     
     async createPedido(data: any): Promise<any>{
