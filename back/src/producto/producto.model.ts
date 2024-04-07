@@ -6,5 +6,5 @@ export class Producto implements Prisma.ProductoCreateInput{
     descripcion: string;
     precio: number;
     opciones?: Prisma.OpcionCreateNestedManyWithoutProductosInput;
-    pedidos?: Prisma.PedidoCreateNestedManyWithoutProductosInput;
+    pedidos?: Prisma.ProductosEnPedidoCreateNestedManyWithoutProductoInput;
 }

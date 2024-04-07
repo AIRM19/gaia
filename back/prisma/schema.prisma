@@ -19,31 +19,39 @@ model Producto {
   descripcion String
   precio Int
   opciones Opcion[]
-  pedidos Pedido[]
+  pedidos ProductosEnPedido[]
 }
 
 model Pedido {
   id String @id @default(nanoid(4))
   nombre String
-  productos Producto[]
+  productos ProductosEnPedido[]
   total Int
-  estado Boolean
-  opcionesPedido OpcionPedido[]
+  estado Boolean @default(false)
+  opcionesPedido OpcionesEnPedido[]
+}
+
+model ProductosEnPedido {
+  pedido Pedido @relation(fields: [pedidoId], references: [id])
+  pedidoId String
+  producto Producto @relation(fields: [productoId], references: [id])
+  productoId Int
+  cantidad Int
+  @@id([pedidoId,productoId])  
 }
 
 model Opcion {
   id Int @id @default(autoincrement())
   titulo String
   productos Producto[]
-  opcionesPedido OpcionPedido[]
+  opcionesPedido OpcionesEnPedido[]
 }
 
-model OpcionPedido {
+model OpcionesEnPedido {
+  pedido Pedido @relation(fields: [pedidoId], references: [id])
+  pedidoId String
   opcion Opcion @relation(fields: [opcionId], references: [id])
   opcionId Int
   cantidad Int
-  pedido Pedido @relation(fields: [pedidoId], references: [id])
-  pedidoId String
   @@id([opcionId,pedidoId])
-  @@unique([opcionId,pedidoId])
 }
