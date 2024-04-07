@@ -5,6 +5,6 @@ export class Pedido implements Prisma.PedidoCreateInput{
     nombre: string;
     productos?: Prisma.ProductosEnPedidoCreateNestedManyWithoutPedidoInput;
     total: number;
-    estado: boolean;
+    estado?: boolean;
     opcionesPedido?: Prisma.OpcionesEnPedidoCreateNestedManyWithoutPedidoInput;
 }

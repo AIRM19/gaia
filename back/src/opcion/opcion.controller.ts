@@ -10,7 +10,6 @@ export class OpcionController{
     @Get()
     async getOpciones(): Promise<Opcion[]>{
         return this.opcionService.getOpciones()
-        
     }
     
     @Post()

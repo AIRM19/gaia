@@ -32,13 +32,15 @@ import Image from 'next/image'
 
 interface ObjetoProducto{
   id: number,
-  titulo: string,
+  titulo?: string,
   cantidad: number
 }
 
 interface ObjetoOpcion{
-  titulo: string,
+  id: number,
+  titulo?: string,
   cantidad: number
+  idProducto?: number
 }
 
 interface Producto {
@@ -46,58 +48,53 @@ interface Producto {
   titulo: string,
   descripcion: string,
   precio: number,
-  cantidad: number,
+  opciones: Array<ObjetoOpcion>,
   cantidadOpciones: number,
-  opciones: Array<ObjetoOpcion> 
+  cantidad: number
 }
 
-const listaProductos: Producto[] = [{id:1, titulo:"3 gorditas", descripcion:"frijol con queso, picadillo o huitlacoche", precio:50, cantidad:0, cantidadOpciones:0, opciones:[{titulo: "frijol con queso", cantidad: 0}, {titulo: "picadillo", cantidad: 0}, {titulo: "huitlacoche", cantidad: 0}]},
-                                    {id:2, titulo:"3 tacos", descripcion:"frijol con queso, picadillo o huitlacoche", precio:50, cantidad:0, cantidadOpciones:0, opciones:[{titulo: "frijol con queso", cantidad: 0}, {titulo: "picadillo", cantidad: 0}, {titulo: "huitlacoche", cantidad: 0}]},
-                                    {id:3, titulo:"1 sincronizada", descripcion:"queso y jamón", precio:25, cantidad:0, cantidadOpciones:0, opciones:[]},
-                                    {id:4, titulo:"tortillas verdes", descripcion:"paquete 500 gramos", precio:50, cantidad:0, cantidadOpciones:0, opciones:[]},
-                                    {id:5, titulo:"1 limonada", descripcion:"400mL", precio:15, cantidad:0, cantidadOpciones:0, opciones:[]}]
-
-let pedido: ObjetoProducto[] = []
+let productosPedido: ObjetoProducto[] = []
+let opcionesPedido: ObjetoOpcion[] = []
 let descuentoActivo = 0                              
 
 export default function Home() {
-  const [productos, setProductos] = useState<Producto[]>(listaProductos)
+  const [productos, setProductos] = useState<Producto[]>([])
   const [total, setTotal] = useState(0)
   const [nombre, setNombre] = useState("")
   const [idOrden, setIdOrden] = useState("")
-  const [estatus, setEstatus] = useState(0)
+  const [estatus, setEstatus] = useState(0) //dialog box nombre y #orden
   
-  /*useEffect(() => {
+  useEffect(() => {
     const fetchProductos = async () => {
-      const listaProductos = await fetch("api")
-      setProductos(listaProductos);
+      const request = await fetch("http://localhost:3000/producto")
+      const prods = await request.json()
+      setProductos(prods)
     }
     fetchProductos().catch(console.error)
-  }, [])*/
+  }, [])
   
-  const crearOrden = () => {
-    const orden = {nombre: nombre, total: total, pedido: pedido}
-    console.log(orden)
+  const crearOrden = async () => {
+    const orden = {nombre: nombre, productos: productosPedido, total: total, opcionesPedido: opcionesPedido}
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orden)
-    };
-    fetch('https://jsonplaceholder.typicode.com/posts', requestOptions)
-        .then(response => response.json())
-        .then(data => setIdOrden(data.id));
+    }
+    const petition = await fetch('http://localhost:3000/pedido', requestOptions)
+    const response = await petition.json()
+    setIdOrden(response.id)
     setEstatus(1)
   }
   
   const quitar = (prod: Producto) => {
     prod.cantidad--
-    let checkProducto = pedido.find(objProducto => objProducto.id == prod.id)
-    if(checkProducto){
+    let checkProducto = productosPedido.find(objProducto => objProducto.id == prod.id)
+    if(checkProducto){// valida porque puede ser indefinido
       if(checkProducto.cantidad > 1){
         checkProducto.cantidad--
       }
       else{
-        pedido.splice(pedido.indexOf(checkProducto), 1)
+        productosPedido.splice(productosPedido.indexOf(checkProducto), 1)
       }
     }
     let incremento = 0
@@ -114,12 +111,12 @@ export default function Home() {
   
   const agregar = (prod: Producto) => {
     prod.cantidad++
-    let checkProducto = pedido.find(objProducto => objProducto.id == prod.id)
+    let checkProducto = productosPedido.find(objProducto => objProducto.id == prod.id)
     if(checkProducto){
       checkProducto.cantidad++
     }
     else{
-      pedido.push({id: prod.id, titulo: prod.titulo, cantidad: 1})
+      productosPedido.push({id: prod.id, cantidad: 1})
     }
     let rebaja = 0
     if(prod.id != 5){
@@ -137,6 +134,15 @@ export default function Home() {
     if(prod.cantidadOpciones > 0 && op.cantidad > 0){
       op.cantidad--
       prod.cantidadOpciones--
+      let checkOpcion = opcionesPedido.find(objOpcion => objOpcion.id == op.id && objOpcion.idProducto == prod.id)
+      if(checkOpcion){// valida porque puede ser indefinido
+        if(checkOpcion.cantidad > 1){
+          checkOpcion.cantidad--
+        }
+        else{
+          opcionesPedido.splice(opcionesPedido.indexOf(checkOpcion), 1)
+        }
+      }
       setProductos([...productos])
     }
   }
@@ -145,6 +151,13 @@ export default function Home() {
     if(prod.cantidadOpciones < prod.cantidad*3){
       op.cantidad++
       prod.cantidadOpciones++
+      let checkOpcion = opcionesPedido.find(objOpcion => objOpcion.id == op.id && objOpcion.idProducto == prod.id)
+      if(checkOpcion){
+        checkOpcion.cantidad++
+      }
+      else{
+        opcionesPedido.push({id: op.id, idProducto: prod.id, cantidad: 1})
+      }
       setProductos([...productos])
     }
   }
@@ -188,7 +201,7 @@ export default function Home() {
                       {producto.opciones.length < 1 ? null : 
                       <div className="grid grid-rows-3 grid-flow-col gap-2 w-full pt-4">
                         {producto.opciones.map(opcion => 
-                        <div className="flex flex-row justify-evenly w-full basis-full">
+                        <div key={opcion.id} className="flex flex-row justify-evenly w-full basis-full">
                           <p className="flex self-center basis-1/2">{opcion.titulo}</p>
                           <Button onClick={()=>{quitarOpcion(producto, opcion)}}>-</Button>
                           <p className="flex self-center justify-center basis-1/6">{opcion.cantidad}</p>
@@ -214,7 +227,7 @@ export default function Home() {
       <div className="flex justify-center">
         <Dialog>
           <DialogTrigger asChild>
-            <Button className="bg-[green]">Ordenar</Button>
+            <Button className="bg-green-600 mb-4">Ordenar</Button>
           </DialogTrigger>
           {estatus == 0 ? 
             <DialogContent>
@@ -228,11 +241,8 @@ export default function Home() {
                   <Input id="nombre" type="text" autoComplete="off" value={nombre} onChange={(e) => setNombre(e.target.value)} className="col-span-3" required />
                 </div>
               </div>
-              <DialogFooter className="sm:justify-start">
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">Regresar</Button>
-                </DialogClose>
-                <Button type="submit" onClick={(e) => crearOrden()}>Pedir</Button>
+              <DialogFooter className="flex flex-row justify-evenly sm:justify-center">
+                <Button type="submit" className="flex basis-1/2" onClick={(e) => crearOrden()}>Pedir</Button>
               </DialogFooter>
             </DialogContent> : null
           }
@@ -240,10 +250,12 @@ export default function Home() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Orden creada con éxito</DialogTitle>
-                <DialogDescription>Tu número de orden es:</DialogDescription>
               </DialogHeader>
-              <div className="flex flex-column justify-center p-4">
-                <p>0123</p>
+              <div className="flex flex-column justify-evenly pt-2.5 pb-0.5 text-center">
+                <p>Tu número de orden es: <span className="font-medium">{idOrden}</span></p>
+              </div>
+              <div className="flex flex-column justify-evenly pb-2 text-center">
+                <p>Paga en efectivo o transfiere a 058597000032996469</p>
               </div>
               <DialogFooter className="sm:justify-center">
                 <Button type="button" variant="secondary" onClick={() => window.location.reload()}>Ok</Button>

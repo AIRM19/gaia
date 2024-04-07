@@ -6,8 +6,8 @@ import { Injectable } from "@nestjs/common";
 export class ProductoService{
     constructor(private prisma: PrismaService){}
     
-    async getProductos(): Promise<Producto[]>{
-        return this.prisma.producto.findMany()
+    async getProductos(): Promise<any>{
+        return this.prisma.producto.findMany({include: {opciones: true}})
     }
     
     async createProducto(data: Producto): Promise<Producto>{

@@ -1,7 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { Producto } from "./producto.model";
 import { ProductoService } from "./producto.service";
-import { Request, Response } from "express";
 
 
 @Controller('producto')
@@ -9,14 +8,8 @@ export class ProductoController{
     constructor(private readonly productoService: ProductoService){}
     
     @Get()
-    async getProductos(@Req() request:Request, @Res() response:Response): Promise<any>{
-        const result = await this.productoService.getProductos()
-        return response.status(200).json({
-            status: "Ok!",
-            message: "Successfully fetch data!",
-            result: result
-        })
-        
+    async getProductos(): Promise<any>{
+        return this.productoService.getProductos()
     }
     
     @Post()

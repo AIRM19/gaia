@@ -20,6 +20,9 @@ model Producto {
   precio Int
   opciones Opcion[]
   pedidos ProductosEnPedido[]
+  cantidadOpciones Int @default(0)
+  cantidad Int @default(0)
+  opcionesPedido OpcionesEnPedido[]
 }
 
 model Pedido {
@@ -45,6 +48,7 @@ model Opcion {
   titulo String
   productos Producto[]
   opcionesPedido OpcionesEnPedido[]
+  cantidad Int @default(0)
 }
 
 model OpcionesEnPedido {
@@ -52,6 +56,8 @@ model OpcionesEnPedido {
   pedidoId String
   opcion Opcion @relation(fields: [opcionId], references: [id])
   opcionId Int
+  producto Producto @relation(fields: [productoId], references: [id])
+  productoId Int
   cantidad Int
-  @@id([opcionId,pedidoId])
+  @@id([opcionId,pedidoId,productoId])
 }
