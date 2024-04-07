@@ -1,18 +1,11 @@
-'use client';
 import Image from 'next/image'
-import { Button } from "@/components/ui/button"
-import { redirect } from 'next/navigation'
 
 export default function Landing() {
-    function re(){
-        redirect('/ventas')
-    }
-    
     return (
         <main>
-            <a href="http://localhost:3001/ordena-aqui">
+            <a href="https://gaiaalimentos.com/ordena-aqui">
                 <div>
-                    <Image src="/1home.jpg" alt="1" width={1366} height={768} priority={true} a/>
+                    <Image src="/1home.jpg" alt="1" width={1366} height={768} priority={true}/>
                 </div>
             </a>
             <div>
