@@ -3,7 +3,7 @@ import Image from 'next/image'
 export default function Landing() {
     return (
         <main>
-            <a href="https://gaiaalimentos.com/ordena-aqui">
+            <a href="/ordena-aqui">
                 <div>
                     <Image src="/1home.jpg" alt="1" width={1366} height={768} priority={true}/>
                 </div>
