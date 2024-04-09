@@ -1,4 +1,4 @@
-import { PrismaService } from "src/prisma.service";
+import { PrismaService } from "../prisma.service";
 import { Pedido } from "./pedido.model";
 import { Injectable } from "@nestjs/common";
 import { log } from "console";
