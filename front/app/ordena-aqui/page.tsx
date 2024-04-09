@@ -226,9 +226,17 @@ export default function Home() {
       </div>
       <div className="flex justify-center">
         <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-green-600 mb-4">Ordenar</Button>
-          </DialogTrigger>
+            {estatus == 0 ?
+              <DialogTrigger asChild>
+                <Button className="bg-green-600 mb-4">Ordenar</Button>
+              </DialogTrigger>:
+              <div className="mb-4">
+                <DialogTrigger asChild>
+                  <Button className="bg-green-600 mr-4">Ver orden</Button>
+                </DialogTrigger>
+                <Button className="bg-slate-700" onClick={() => window.location.reload()}>Nueva orden</Button>
+              </div>
+            }
           {estatus == 0 ? 
             <DialogContent>
               <DialogHeader>
@@ -258,7 +266,9 @@ export default function Home() {
                 <p>Paga en efectivo o transfiere a 058597000032996469</p>
               </div>
               <DialogFooter className="sm:justify-center">
-                <Button type="button" variant="secondary" onClick={() => window.location.reload()}>Ok</Button>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">Ok</Button>
+                </DialogClose>
               </DialogFooter>
             </DialogContent> : null
           }
