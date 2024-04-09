@@ -80,7 +80,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orden)
     }
-    const petition = await fetch('https://gaia-back.vercel.app//pedido', requestOptions)
+    const petition = await fetch('https://gaia-back.vercel.app/pedido', requestOptions)
     const response = await petition.json()
     setIdOrden(response.id)
     setEstatus(1)
