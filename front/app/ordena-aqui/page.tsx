@@ -66,7 +66,7 @@ export default function Home() {
   
   useEffect(() => {
     const fetchProductos = async () => {
-      const request = await fetch("http://localhost:3000/producto")
+      const request = await fetch("https://gaia-back.vercel.app/producto")
       const prods = await request.json()
       setProductos(prods)
     }
@@ -80,7 +80,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orden)
     }
-    const petition = await fetch('http://localhost:3000/pedido', requestOptions)
+    const petition = await fetch('https://gaia-back.vercel.app//pedido', requestOptions)
     const response = await petition.json()
     setIdOrden(response.id)
     setEstatus(1)

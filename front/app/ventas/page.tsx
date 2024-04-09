@@ -42,7 +42,7 @@ export default function Pedidos() {
     
     useEffect(() => {
         const fetchProductos = async () => {
-          const request = await fetch("http://localhost:3000/pedido")
+          const request = await fetch("https://gaia-back.vercel.app/pedido")
           const ped = await request.json()
           console.log(ped)
           setPedidos(ped)
