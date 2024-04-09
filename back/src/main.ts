@@ -4,7 +4,8 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: ['https://gaiaalimentos.vercel.app/ventas', 'https://gaiaalimentos.vercel.app/ordena-aqui']
+    origin: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
   });
   await app.listen(3000);
 }
