@@ -30,12 +30,6 @@ interface Pedido{
     estado: boolean
     productos: Array<Platillo>,
 }
-
-const listaPedidos = [{id: 1234, nombre: "Luisa", productos: [{id:1, titulo: "3 gorditas", cantidad: 1, opciones: [{titulo: "frijoles", cantidad: 2}, {titulo: "huitlacoche", cantidad: 1}]}, {id:4, titulo: "1 limonada", cantidad: 1, opciones: []}], total: 60, estado: false},
-                      {id: 1235, nombre: "Sofia", productos: [{id:3, titulo: "1 sincronizada", cantidad: 2, opciones: []}, {id:4, titulo: "1 limonada", cantidad: 2, opciones: []}], total: 70, estado: false},
-                      {id: 1236, nombre: "Jorge", productos: [{id:2, titulo: "3 tacos", cantidad: 1, opciones: [{titulo: "picadillo", cantidad:3}]}], total: 50, estado: false}]
-
-const platillos = [{id:1, titulo:"3 gorditas"}, {id:2, titulo:"3 tacos"}, {id:3, titulo:"1 sincronizada"}, {id:4, titulo:"tortillas verdes"}, {id:5, titulo:"1 limonada"}]
                       
 export default function Pedidos() {
     const [pedidos, setPedidos] = useState<Pedido[]>([])
@@ -50,9 +44,11 @@ export default function Pedidos() {
         fetchProductos().catch(console.error)
       }, [])
     
-    const cambiarEstatusOrden = (orden: Pedido) => {
+    const cambiarEstatusOrden = async (orden: Pedido) => {
         orden.estado = !orden.estado
         setPedidos([...pedidos])
+        const url = 'https://gaia-back.vercel.app/pedido/' + orden.id
+        await fetch(url, {method:'PUT'})
     }
     
     return (
