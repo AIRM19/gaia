@@ -33,6 +33,7 @@ model Pedido {
   total Int
   estado Boolean @default(false)
   opcionesPedido OpcionesEnPedido[]
+  fecha DateTime @default(now())
 }
 
 model ProductosEnPedido {
