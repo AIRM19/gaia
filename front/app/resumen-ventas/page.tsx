@@ -22,14 +22,14 @@ import {
 } from "@/components/ui/popover"
 
 export default function Reporte({className}: React.HTMLAttributes<HTMLDivElement>) {
-    const [date, setDate] = React.useState<DateRange | undefined>({
+    /*const [date, setDate] = React.useState<DateRange | undefined>({
         from: addDays(new Date(), -1),
         to: new Date(),
-    })
+    })*/
 
     return(
         <main>
-            <div>
+            {/*<div>
             <h1>Ventas Por Dia</h1>
             </div>
             <div className={cn("grid gap-2", className)}>
@@ -69,7 +69,7 @@ export default function Reporte({className}: React.HTMLAttributes<HTMLDivElement
                     />
                     </PopoverContent>
                 </Popover>
-            </div>
+            </div>*/}
         </main>
     )
 }

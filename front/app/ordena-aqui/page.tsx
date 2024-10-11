@@ -267,7 +267,7 @@ export default function Home() {
               </div>
               <DialogFooter className="sm:justify-center">
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">Ok</Button>
+                  <Button type="button">Ok</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent> : null
