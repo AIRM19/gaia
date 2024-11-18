@@ -7,10 +7,7 @@ import { PedidoService } from "./pedido.service";
 export class PedidoController{
     constructor(private readonly pedidoService: PedidoService){}
     
-    @Get()
-    async getPedidos(): Promise<any>{
-        return this.pedidoService.getPedidos()        
-    }
+    
     
     @Post()
     async postPedido(@Body() postData: Pedido): Promise<Pedido>{
