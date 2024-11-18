@@ -9,6 +9,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { config } from '../../constants';
 
 interface Opcion{
     id: number,
@@ -36,7 +37,7 @@ export default function Pedidos() {
     
     useEffect(() => {
         const fetchProductos = async () => {
-          const request = await fetch("https://gaia-back.vercel.app/pedido")
+          const request = await fetch(config.pedido_url)
           const ped = await request.json()
           console.log(ped)
           setPedidos(ped)
@@ -47,7 +48,7 @@ export default function Pedidos() {
     const cambiarEstatusOrden = async (orden: Pedido) => {
         orden.estado = !orden.estado
         setPedidos([...pedidos])
-        const url = 'https://gaia-back.vercel.app/pedido/' + orden.id
+        const url = config.pedido_url + orden.id
         await fetch(url, {method:'PUT'})
     }
     

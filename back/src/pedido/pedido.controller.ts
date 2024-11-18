@@ -7,7 +7,10 @@ import { PedidoService } from "./pedido.service";
 export class PedidoController{
     constructor(private readonly pedidoService: PedidoService){}
     
-    
+    @Get()
+    async getPedidos(): Promise<any>{
+        return this.pedidoService.getPedidos()
+    }
     
     @Post()
     async postPedido(@Body() postData: Pedido): Promise<Pedido>{
@@ -19,7 +22,7 @@ export class PedidoController{
         return this.pedidoService.updateEstado(id)
     }
 
-    @Get()
+    /*@Get()
     async getResumen(): Promise<any>{
         return this.pedidoService.getResumen()
     }
@@ -27,5 +30,5 @@ export class PedidoController{
     @Get()
     async queryPedidos(){
         return this.pedidoService.queryPedidos()
-    }
+    }*/
 }
