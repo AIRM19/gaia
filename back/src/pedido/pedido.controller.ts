@@ -21,4 +21,14 @@ export class PedidoController{
     async updatePedido(@Param('id') id:string): Promise<Pedido>{
         return this.pedidoService.updateEstado(id)
     }
+
+    @Get()
+    async getResumen(): Promise<any>{
+        return this.pedidoService.getResumen()
+    }
+
+    @Get()
+    async queryPedidos(){
+        return this.pedidoService.queryPedidos()
+    }
 }

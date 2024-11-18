@@ -3,12 +3,26 @@ import { Pedido } from "./pedido.model";
 import { Injectable } from "@nestjs/common";
 import { log } from "console";
 import { Prisma } from "@prisma/client";
-import { connect } from "http2";
 
 @Injectable()
 export class PedidoService{
     constructor(private prisma: PrismaService){}
     
+    async queryPedidos(){
+        return await this.prisma.pedido.findMany({
+            include: {productos: true, opcionesPedido: true},
+        })
+    }
+
+    async getResumen(): Promise<any>{
+        const listaProductos = await this.prisma.producto.findMany({
+            select: {
+                id: true,
+                titulo: true
+            }
+        })
+    }
+
     async getPedidos(): Promise<any>{
         const pedidos = await this.prisma.pedido.findMany({
             include: {productos: true, opcionesPedido: true},
