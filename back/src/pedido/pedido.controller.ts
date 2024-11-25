@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 import { Pedido } from "./pedido.model";
 import { PedidoService } from "./pedido.service";
 
-
 @Controller('pedido')
 export class PedidoController{
     constructor(private readonly pedidoService: PedidoService){}
@@ -22,13 +21,8 @@ export class PedidoController{
         return this.pedidoService.updateEstado(id)
     }
 
-    /*@Get()
-    async getResumen(): Promise<any>{
-        return this.pedidoService.getResumen()
+    @Get('resumen/:fecha')
+    async getResumen(@Param('fecha') fecha: string): Promise<any>{
+        return this.pedidoService.getResumen(fecha)
     }
-
-    @Get()
-    async queryPedidos(){
-        return this.pedidoService.queryPedidos()
-    }*/
 }

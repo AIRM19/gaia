@@ -8,19 +8,58 @@ import { Prisma } from "@prisma/client";
 export class PedidoService{
     constructor(private prisma: PrismaService){}
     
-    async queryPedidos(){
+    async queryPedidos(fechaQuery: string){
         return await this.prisma.pedido.findMany({
-            include: {productos: true, opcionesPedido: true},
+            where: {
+                fecha:{
+                    lte: new Date(fechaQuery+"T23:59:59"), 
+                    gte: new Date(fechaQuery+"T00:00:00")
+                }
+            },
+            select: {
+                id: true,
+                total:true
+            }
         })
     }
 
-    async getResumen(): Promise<any>{
+    async getResumen(fecha: string): Promise<any>{
         const listaProductos = await this.prisma.producto.findMany({
             select: {
                 id: true,
-                titulo: true
+                titulo: true,
+                precio: true
             }
         })
+
+        const listaPedidos = await this.queryPedidos(fecha)
+        
+        let idPedidos=[]
+        let totalPedidos=0
+        for(let i=0; i<listaPedidos.length; i++){
+            idPedidos.push(listaPedidos[i].id)
+            totalPedidos+=listaPedidos[i].total
+        }
+        
+        const productosEnPedidos = await this.prisma.productosEnPedido.groupBy({
+            by: ['productoId'],
+            where: {
+                pedidoId: { in: idPedidos}
+            },
+            _sum: {
+                cantidad: true,
+            },
+            orderBy: {
+                productoId: 'asc'
+            }
+        })
+        
+        let resumen = []
+        for(let i=0; i<productosEnPedidos.length; i++){
+            resumen.push({id:i, titulo: listaProductos[i].titulo, cantidad: productosEnPedidos[i]._sum.cantidad, total: productosEnPedidos[i]._sum.cantidad*listaProductos[i].precio})
+        }
+
+        return resumen
     }
 
     async getPedidos(): Promise<any>{

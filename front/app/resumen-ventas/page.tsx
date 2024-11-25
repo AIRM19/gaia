@@ -1,5 +1,5 @@
 'use client';
-import * as React from "react"
+import { use, useEffect, useState } from "react";
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -18,17 +18,32 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { config } from '../../constants';
 
 interface Producto{
     id: number,
     titulo: string,
-    ordenes: number,
+    cantidad: number,
     total: number
 }
 
 export default function Reporte() {
-    const [date, setDate] = React.useState<Date>()
-    const [productos, setProductos] = React.useState<Producto[]>([])
+    const [date, setDate] = useState<Date>()
+    const [productos, setProductos] = useState<Producto[]>([])
+
+    useEffect(() => {
+        const queryDate = date?.toJSON().substring(0,10)
+        const fetchProductosPedidos = async () => {
+            const request = await fetch(config.pedido_url+"/resumen/"+queryDate)
+            const prods = await request.json()
+            if(prods.statusCode != 500){
+                setProductos(prods)
+            }
+        }
+        if(queryDate != undefined){
+            fetchProductosPedidos().catch(console.error)
+        }
+      }, [date])
     
     return(
         <main>
@@ -69,7 +84,7 @@ export default function Reporte() {
                         {productos.map(producto => (
                             <TableRow key={producto.id}>
                             <TableCell>{producto.titulo}</TableCell>
-                            <TableCell className="flex-wrap">{producto.ordenes}</TableCell>
+                            <TableCell className="flex-wrap">{producto.cantidad}</TableCell>
                             <TableCell>{producto.total}</TableCell>
                             </TableRow>))
                         }
