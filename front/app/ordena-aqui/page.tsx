@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from 'next/image'
+import { config } from '../../constants';
 
 interface ObjetoProducto{
   id: number,
@@ -66,7 +67,7 @@ export default function Home() {
   
   useEffect(() => {
     const fetchProductos = async () => {
-      const request = await fetch("https://gaia-back.vercel.app/producto")
+      const request = await fetch(config.producto_url)
       const prods = await request.json()
       setProductos(prods)
     }
@@ -80,7 +81,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orden)
     }
-    const petition = await fetch('https://gaia-back.vercel.app/pedido', requestOptions)
+    const petition = await fetch(config.pedido_url, requestOptions)
     const response = await petition.json()
     setIdOrden(response.id)
     setEstatus(1)

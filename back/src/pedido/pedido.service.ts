@@ -3,17 +3,90 @@ import { Pedido } from "./pedido.model";
 import { Injectable } from "@nestjs/common";
 import { log } from "console";
 import { Prisma } from "@prisma/client";
-import { connect } from "http2";
 
 @Injectable()
 export class PedidoService{
     constructor(private prisma: PrismaService){}
     
-    async getPedidos(): Promise<any>{
-        const pedidos = await this.prisma.pedido.findMany({
-            include: {productos: true, opcionesPedido: true},
+    async queryPedidos(fechaQuery: string){
+        return await this.prisma.pedido.findMany({
+            where: {
+                fecha:{
+                    lte: new Date(fechaQuery+"T23:59:59"), 
+                    gte: new Date(fechaQuery+"T00:00:00")
+                }
+            },
+            include: {
+                productos: true, 
+                opcionesPedido: true
+            }
         })
-        let result = []
+    }
+
+    async getResumen(fecha: string): Promise<any>{
+        const listaProductos = await this.prisma.producto.findMany({
+            select: {
+                id: true,
+                titulo: true,
+                precio: true
+            }
+        })
+
+        const listaPedidos = await this.queryPedidos(fecha)
+        
+        let idPedidos=[]
+        let totalPedidos=0
+        for(let i=0; i<listaPedidos.length; i++){
+            idPedidos.push(listaPedidos[i].id)
+            totalPedidos=totalPedidos+listaPedidos[i].total
+        }
+        
+        const productosEnPedidos = await this.prisma.productosEnPedido.groupBy({
+            by: ['productoId'],
+            where: {
+                pedidoId: { in: idPedidos}
+            },
+            _sum: {
+                cantidad: true,
+            },
+            orderBy: {
+                productoId: 'asc'
+            }
+        })
+        
+        let resumen = []
+        for(let i=0; i<productosEnPedidos.length; i++){
+            let titulo=""
+            let total=0
+            const cantidad=productosEnPedidos[i]._sum.cantidad
+
+            for(let j=0; j<listaProductos.length; j++){
+                if(productosEnPedidos[i].productoId == listaProductos[j].id){
+                    titulo=listaProductos[j].titulo
+                    total=cantidad*listaProductos[j].precio
+                }
+            }
+            
+            resumen.push({id:i, titulo: titulo, cantidad: cantidad, total: total})
+        }
+
+        return [resumen, totalPedidos]
+    }
+
+    async getPedidos(fecha?: string): Promise<any>{
+        let pedidos = []
+        if(fecha){
+            pedidos = await this.queryPedidos(fecha)
+        }
+        else{
+            pedidos = await this.prisma.pedido.findMany({
+                include: {
+                    productos: true, 
+                    opcionesPedido: true
+                }
+            })
+
+        }
         
         const listaProductos = await this.prisma.producto.findMany({
             select: {
@@ -29,19 +102,7 @@ export class PedidoService{
             }
         })
         
-        let opciones = pedidos.map(pedido => {
-            return pedido.productos.map(producto => {
-                const filtered = pedido.opcionesPedido.filter(opcion => {if(producto.productoId == opcion.productoId){return true}})
-                const mapped = filtered.map(opcion => {
-                    return {
-                    id: opcion.opcionId,
-                    titulo: listaOpciones.find(objOpcion => objOpcion.id == opcion.opcionId).titulo,
-                    cantidad: opcion.cantidad                            
-                }})
-                return mapped
-            })
-        })
-        
+        let result = []
         let productos = pedidos.map(pedido => {
              return pedido.productos.map(producto => {
                 const filtered = pedido.opcionesPedido.filter(opcion => {if(producto.productoId == opcion.productoId){return true}})
@@ -60,8 +121,6 @@ export class PedidoService{
                 return a
             })
         })
-        
-        log(productos)
         
         pedidos.map((pedido,index) => {
             result.push({
