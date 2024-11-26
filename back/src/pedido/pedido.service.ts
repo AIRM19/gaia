@@ -16,9 +16,9 @@ export class PedidoService{
                     gte: new Date(fechaQuery+"T00:00:00")
                 }
             },
-            select: {
-                id: true,
-                total:true
+            include: {
+                productos: true, 
+                opcionesPedido: true
             }
         })
     }
@@ -38,7 +38,7 @@ export class PedidoService{
         let totalPedidos=0
         for(let i=0; i<listaPedidos.length; i++){
             idPedidos.push(listaPedidos[i].id)
-            totalPedidos+=listaPedidos[i].total
+            totalPedidos=totalPedidos+listaPedidos[i].total
         }
         
         const productosEnPedidos = await this.prisma.productosEnPedido.groupBy({
@@ -56,17 +56,37 @@ export class PedidoService{
         
         let resumen = []
         for(let i=0; i<productosEnPedidos.length; i++){
-            resumen.push({id:i, titulo: listaProductos[i].titulo, cantidad: productosEnPedidos[i]._sum.cantidad, total: productosEnPedidos[i]._sum.cantidad*listaProductos[i].precio})
+            let titulo=""
+            let total=0
+            const cantidad=productosEnPedidos[i]._sum.cantidad
+
+            for(let j=0; j<listaProductos.length; j++){
+                if(productosEnPedidos[i].productoId == listaProductos[j].id){
+                    titulo=listaProductos[j].titulo
+                    total=cantidad*listaProductos[j].precio
+                }
+            }
+            
+            resumen.push({id:i, titulo: titulo, cantidad: cantidad, total: total})
         }
 
-        return resumen
+        return [resumen, totalPedidos]
     }
 
-    async getPedidos(): Promise<any>{
-        const pedidos = await this.prisma.pedido.findMany({
-            include: {productos: true, opcionesPedido: true},
-        })
-        let result = []
+    async getPedidos(fecha?: string): Promise<any>{
+        let pedidos = []
+        if(fecha){
+            pedidos = await this.queryPedidos(fecha)
+        }
+        else{
+            pedidos = await this.prisma.pedido.findMany({
+                include: {
+                    productos: true, 
+                    opcionesPedido: true
+                }
+            })
+
+        }
         
         const listaProductos = await this.prisma.producto.findMany({
             select: {
@@ -82,19 +102,7 @@ export class PedidoService{
             }
         })
         
-        let opciones = pedidos.map(pedido => {
-            return pedido.productos.map(producto => {
-                const filtered = pedido.opcionesPedido.filter(opcion => {if(producto.productoId == opcion.productoId){return true}})
-                const mapped = filtered.map(opcion => {
-                    return {
-                    id: opcion.opcionId,
-                    titulo: listaOpciones.find(objOpcion => objOpcion.id == opcion.opcionId).titulo,
-                    cantidad: opcion.cantidad                            
-                }})
-                return mapped
-            })
-        })
-        
+        let result = []
         let productos = pedidos.map(pedido => {
              return pedido.productos.map(producto => {
                 const filtered = pedido.opcionesPedido.filter(opcion => {if(producto.productoId == opcion.productoId){return true}})
@@ -113,8 +121,6 @@ export class PedidoService{
                 return a
             })
         })
-        
-        log(productos)
         
         pedidos.map((pedido,index) => {
             result.push({

@@ -25,4 +25,9 @@ export class PedidoController{
     async getResumen(@Param('fecha') fecha: string): Promise<any>{
         return this.pedidoService.getResumen(fecha)
     }
+
+    @Get(':fecha')
+    async getPedidosFecha(@Param('fecha') fecha: string): Promise<any>{
+        return this.pedidoService.getPedidos(fecha)
+    }
 }

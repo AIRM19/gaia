@@ -48,7 +48,7 @@ export default function Pedidos() {
     const cambiarEstatusOrden = async (orden: Pedido) => {
         orden.estado = !orden.estado
         setPedidos([...pedidos])
-        const url = config.pedido_url + orden.id
+        const url = config.pedido_url + '/' + orden.id
         await fetch(url, {method:'PUT'})
     }
     
